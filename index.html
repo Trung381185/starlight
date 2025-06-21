@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <title>📚 Flashcard Từ Vựng & Ngữ Pháp</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      font-family: Arial; text-align: center; padding: 20px;
+      
+      background-size: cover; background-attachment: fixed;
+      background-position: center; color: #333;
+      backdrop-filter: brightness(95%) blur(2px);
+    }
+    button { margin: 5px; padding: 10px; font-size: 16px; }
+    .card { width: 300px; height: 150px; margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid #ccc; border-radius: 10px; cursor: pointer; background: rgba(255,255,255,0.8); }
+    .card.back { background: rgba(224,247,250,0.9); }
+    input, select { margin: 5px; padding: 8px; font-size: 16px; }
+    .section { margin-top: 20px; text-align: left; }
+    .remove-btn { color: red; cursor: pointer; margin-left: 10px; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 5px 0; border-bottom: 1px dashed #ccc; padding: 5px; }
+    .quiz-option { display: block; margin: 5px auto; padding: 8px; width: 80%; cursor: pointer; }
+    .correct { background: #d4f4d7; }
+    .wrong { background: #f8d7da; }
+    .level-btn.active { background: #2196f3; color: white; }
+    .tab-sub { margin: 10px 0; }
+    .tab-sub button { padding: 8px 12px; }
+    .tab-sub button.active { background: #2196f3; color: white; }
+    .content-sub { display: none; }
+  </style>
+</head>
+<body>
+
+<h1>📚 Flashcard Từ Vựng & Ngữ Pháp</h1>
+
+<div>
+  <button onclick="showTab('flashcardTab')">🃏 Flashcard từ vựng</button>
+  <button onclick="showTab('wordListTab')">📝 Danh sách từ</button>
+  <button onclick="showTab('grammarTab')">📖 Ngữ pháp</button>
+</div>
+
+<!-- Flashcard từ vựng -->
+<div id="flashcardTab">
+  <div>
+    <button class="level-btn" onclick="setFilterLevel('N5')">N5</button>
+    <button class="level-btn" onclick="setFilterLevel('N4')">N4</button>
+    <button class="level-btn" onclick="setFilterLevel('N3')">N3</button>
+    <button class="level-btn" onclick="setFilterLevel('N2')">N2</button>
+    <button class="level-btn" onclick="setFilterLevel('N1')">N1</button>
+    <button class="level-btn" onclick="setFilterLevel('all')">Tất cả</button>
+  </div>
+
+  <div class="card" id="flashcard" onclick="flipCard()">
+    <div id="cardContent">Nhấn để xem thẻ</div>
+  </div>
+  <button onclick="nextCard()">➡️ Tiếp</button>
+  <button onclick="startQuiz()">🧠 Trắc nghiệm</button>
+
+  <div class="quiz" id="quizBox" style="display:none;">
+    <div id="quizQuestion"></div>
+    <button class="quiz-option" onclick="checkAnswer(this)"></button>
+    <button class="quiz-option" onclick="checkAnswer(this)"></button>
+    <button class="quiz-option" onclick="checkAnswer(this)"></button>
+    <button class="quiz-option" onclick="checkAnswer(this)"></button>
+    <br />
+    <button onclick="startQuiz()">🔁 Câu khác</button>
+  </div>
+</div>
+
+<!-- Danh sách từ -->
+<div id="wordListTab" style="display:none;">
+  <h3>📝 Thêm từ mới</h3>
+  <input type="text" id="vocab" placeholder="Từ vựng" />
+  <input type="text" id="romaji" placeholder="Romaji" />
+  <input type="text" id="meaning" placeholder="Nghĩa" />
+  <select id="level">
+    <option value="N5">N5</option>
+    <option value="N4">N4</option>
+    <option value="N3">N3</option>
+    <option value="N2">N2</option>
+    <option value="N1">N1</option>
+  </select>
+  <br />
+  <button onclick="addWord()">➕ Thêm từ</button>
+
+  <div class="section">
+    <h3>📚 N5</h3>
+    <ul id="list-N5"></ul>
+    <h3>📚 N4</h3>
+    <ul id="list-N4"></ul>
+    <h3>📚 N3</h3>
+    <ul id="list-N3"></ul>
+    <h3>📚 N2</h3>
+    <ul id="list-N2"></ul>
+    <h3>📚 N1</h3>
+    <ul id="list-N1"></ul>
+  </div>
+</div>
+
+<!-- Ngữ pháp -->
+<div id="grammarTab" style="display:none;">
+  <div class="tab-sub">
+    <button onclick="showGrammarSub('addGrammar')" id="tabAddGrammar" class="active">➕ Thêm ngữ pháp</button>
+    <button onclick="showGrammarSub('flashGrammar')" id="tabFlashGrammar">🃏 Flashcard & Trắc nghiệm</button>
+  </div>
+
+  <!-- Sub tab 1: Thêm ngữ pháp -->
+  <div id="addGrammar" class="content-sub" style="display:block;">
+    <h3>📖 Thêm ngữ pháp mới</h3>
+    <input type="text" id="grammarText" placeholder="Mẫu ngữ pháp" />
+    <input type="text" id="grammarMeaning" placeholder="Nghĩa" />
+    <select id="grammarLevel">
+      <option value="N5">N5</option>
+      <option value="N4">N4</option>
+      <option value="N3">N3</option>
+      <option value="N2">N2</option>
+      <option value="N1">N1</option>
+    </select>
+    <br />
+    <button onclick="addGrammar()">➕ Thêm ngữ pháp</button>
+
+    <div class="section">
+      <h3>📖 N5</h3>
+      <ul id="grammar-N5"></ul>
+      <h3>📖 N4</h3>
+      <ul id="grammar-N4"></ul>
+      <h3>📖 N3</h3>
+      <ul id="grammar-N3"></ul>
+      <h3>📖 N2</h3>
+      <ul id="grammar-N2"></ul>
+      <h3>📖 N1</h3>
+      <ul id="grammar-N1"></ul>
+    </div>
+  </div>
+
+  <!-- Sub tab 2: Flashcard & Trắc nghiệm -->
+  <div id="flashGrammar" class="content-sub">
+    <div>
+      <button class="level-btn" onclick="setGrammarFilter('N5')">N5</button>
+      <button class="level-btn" onclick="setGrammarFilter('N4')">N4</button>
+      <button class="level-btn" onclick="setGrammarFilter('N3')">N3</button>
+      <button class="level-btn" onclick="setGrammarFilter('N2')">N2</button>
+      <button class="level-btn" onclick="setGrammarFilter('N1')">N1</button>
+      <button class="level-btn" onclick="setGrammarFilter('all')">Tất cả</button>
+    </div>
+
+    <div class="card" id="grammarFlashcard" onclick="flipGrammarCard()">
+      <div id="grammarCardContent">Nhấn để xem thẻ</div>
+    </div>
+    <button onclick="nextGrammarCard()">➡️ Tiếp</button>
+    <button onclick="startGrammarQuiz()">🧠 Trắc nghiệm</button>
+
+    <div class="quiz" id="grammarQuizBox" style="display:none;">
+      <div id="grammarQuizQuestion"></div>
+      <button class="quiz-option" onclick="checkGrammarAnswer(this)"></button>
+      <button class="quiz-option" onclick="checkGrammarAnswer(this)"></button>
+      <button class="quiz-option" onclick="checkGrammarAnswer(this)"></button>
+      <button class="quiz-option" onclick="checkGrammarAnswer(this)"></button>
+      <br />
+      <button onclick="startGrammarQuiz()">🔁 Câu khác</button>
+    </div>
+  </div>
+</div>
+<script>
+let words = JSON.parse(localStorage.getItem('words') || '[]');
+let grammar = JSON.parse(localStorage.getItem('grammar') || '{}');
+let currentIndex = -1, flipped = false, filterLevel = 'all';
+let grammarCurrentIndex = -1, grammarFlipped = false, grammarFilterLevel = 'all';
+
+function showTab(tab) {
+  document.getElementById('flashcardTab').style.display = 'none';
+  document.getElementById('wordListTab').style.display = 'none';
+  document.getElementById('grammarTab').style.display = 'none';
+  document.getElementById(tab).style.display = 'block';
+}
+
+function showGrammarSub(sub) {
+  document.getElementById('addGrammar').style.display = 'none';
+  document.getElementById('flashGrammar').style.display = 'none';
+  document.getElementById(sub).style.display = 'block';
+  document.getElementById('tabAddGrammar').classList.remove('active');
+  document.getElementById('tabFlashGrammar').classList.remove('active');
+  if (sub === 'addGrammar') {
+    document.getElementById('tabAddGrammar').classList.add('active');
+  } else {
+    document.getElementById('tabFlashGrammar').classList.add('active');
+  }
+}
+
+function addWord() {
+  const vocab = document.getElementById('vocab').value.trim();
+  const romaji = document.getElementById('romaji').value.trim();
+  const meaning = document.getElementById('meaning').value.trim();
+  const level = document.getElementById('level').value;
+  if (vocab && meaning) {
+    words.push({ vocab, romaji, meaning, level });
+    localStorage.setItem('words', JSON.stringify(words));
+    updateWordList();
+    alert('✅ Đã thêm từ!');
+    document.getElementById('vocab').value = '';
+    document.getElementById('romaji').value = '';
+    document.getElementById('meaning').value = '';
+  }
+}
+
+function updateWordList() {
+  ['N5','N4','N3','N2','N1'].forEach(level=>{
+    const list = document.getElementById('list-'+level);
+    list.innerHTML = '';
+    words.filter(w=>w.level===level).forEach((w,i)=>{
+      const li = document.createElement('li');
+      li.innerHTML = `${w.vocab} (${w.romaji}) - ${w.meaning} <span class="remove-btn" onclick="removeWord(${i})">❌</span>`;
+      list.appendChild(li);
+    });
+  });
+}
+
+function removeWord(index) {
+  if (confirm(`Xoá từ "${words[index].vocab}"?`)) {
+    words.splice(index,1);
+    localStorage.setItem('words',JSON.stringify(words));
+    updateWordList();
+  }
+}
+
+function setFilterLevel(level) {
+  filterLevel = level;
+  document.querySelectorAll('.level-btn').forEach(btn=>btn.classList.remove('active'));
+  event.target.classList.add('active');
+  nextCard();
+}
+
+function nextCard() {
+  let list = filterLevel==='all'?words:words.filter(w=>w.level===filterLevel);
+  if (list.length===0) {
+    document.getElementById('cardContent').textContent = '📭 Không có từ!';
+    return;
+  }
+  currentIndex = Math.floor(Math.random()*list.length);
+  flipped = false;
+  document.getElementById('cardContent').textContent = `${list[currentIndex].vocab} (${list[currentIndex].romaji})`;
+  document.getElementById('flashcard').className = 'card';
+}
+
+function flipCard() {
+  if (currentIndex<0) return;
+  flipped=!flipped;
+  let list = filterLevel==='all'?words:words.filter(w=>w.level===filterLevel);
+  if (flipped) {
+    document.getElementById('cardContent').textContent = list[currentIndex].meaning;
+    document.getElementById('flashcard').className = 'card back';
+  } else {
+    document.getElementById('cardContent').textContent = `${list[currentIndex].vocab} (${list[currentIndex].romaji})`;
+    document.getElementById('flashcard').className = 'card';
+  }
+}
+
+function startQuiz() {
+  let list = filterLevel==='all'?words:words.filter(w=>w.level===filterLevel);
+  if (list.length<4) {
+    alert('Cần ít nhất 4 thẻ để chơi trắc nghiệm.');
+    return;
+  }
+  document.getElementById('quizBox').style.display='block';
+  const index = Math.floor(Math.random()*list.length);
+  const question = list[index];
+  const options = [question.meaning];
+  while (options.length<4) {
+    let rand = list[Math.floor(Math.random()*list.length)];
+    if (!options.includes(rand.meaning)) options.push(rand.meaning);
+  }
+  options.sort(()=>Math.random()-0.5);
+  document.getElementById('quizQuestion').textContent = `Từ: ${question.vocab} (${question.romaji})`;
+  const buttons = document.querySelectorAll('#quizBox .quiz-option');
+  buttons.forEach((btn,i)=>{
+    btn.textContent = options[i];
+    btn.disabled=false;
+    btn.dataset.correct = options[i]===question.meaning?'true':'false';
+    btn.className = 'quiz-option';
+  });
+}
+
+function checkAnswer(button) {
+  const isCorrect = button.dataset.correct==='true';
+  const buttons = document.querySelectorAll('#quizBox .quiz-option');
+  buttons.forEach(btn=>{
+    btn.disabled=true;
+    if (btn.dataset.correct==='true') btn.classList.add('correct');
+    else if (btn===button) btn.classList.add('wrong');
+  });
+}
+
+function addGrammar() {
+  const text = document.getElementById('grammarText').value.trim();
+  const meaning = document.getElementById('grammarMeaning').value.trim();
+  const level = document.getElementById('grammarLevel').value;
+  if (!grammar[level]) grammar[level]=[];
+  if (text && meaning) {
+    grammar[level].push({ text, meaning });
+    localStorage.setItem('grammar',JSON.stringify(grammar));
+    updateGrammarList();
+    alert('✅ Đã thêm ngữ pháp!');
+    document.getElementById('grammarText').value='';
+    document.getElementById('grammarMeaning').value='';
+  }
+}
+
+function updateGrammarList() {
+  ['N5','N4','N3','N2','N1'].forEach(level=>{
+    const list = document.getElementById('grammar-'+level);
+    list.innerHTML='';
+    (grammar[level]||[]).forEach((g,i)=>{
+      const li = document.createElement('li');
+      li.innerHTML = `${g.text} - ${g.meaning} <span class="remove-btn" onclick="removeGrammar('${level}',${i})">❌</span>`;
+      list.appendChild(li);
+    });
+  });
+}
+
+function removeGrammar(level,index) {
+  if (confirm(`Xoá mẫu "${grammar[level][index].text}"?`)) {
+    grammar[level].splice(index,1);
+    localStorage.setItem('grammar',JSON.stringify(grammar));
+    updateGrammarList();
+  }
+}
+
+function setGrammarFilter(level) {
+  grammarFilterLevel=level;
+  document.querySelectorAll('#flashGrammar .level-btn').forEach(btn=>btn.classList.remove('active'));
+  event.target.classList.add('active');
+  nextGrammarCard();
+}
+
+function nextGrammarCard() {
+  let list = grammarFilterLevel==='all'?Object.values(grammar).flat():(grammar[grammarFilterLevel]||[]);
+  if (list.length===0) {
+    document.getElementById('grammarCardContent').textContent='📭 Không có mẫu!';
+    return;
+  }
+  grammarCurrentIndex = Math.floor(Math.random()*list.length);
+  grammarFlipped=false;
+  document.getElementById('grammarCardContent').textContent=list[grammarCurrentIndex].text;
+  document.getElementById('grammarFlashcard').className='card';
+}
+
+function flipGrammarCard() {
+  if (grammarCurrentIndex<0) return;
+  let list = grammarFilterLevel==='all'?Object.values(grammar).flat():(grammar[grammarFilterLevel]||[]);
+  grammarFlipped=!grammarFlipped;
+  if (grammarFlipped) {
+    document.getElementById('grammarCardContent').textContent=list[grammarCurrentIndex].meaning;
+    document.getElementById('grammarFlashcard').className='card back';
+  } else {
+    document.getElementById('grammarCardContent').textContent=list[grammarCurrentIndex].text;
+    document.getElementById('grammarFlashcard').className='card';
+  }
+}
+
+function startGrammarQuiz() {
+  let list = grammarFilterLevel==='all'?Object.values(grammar).flat():(grammar[grammarFilterLevel]||[]);
+  if (list.length<4) {
+    alert('Cần ít nhất 4 mẫu để chơi trắc nghiệm.');
+    return;
+  }
+  document.getElementById('grammarQuizBox').style.display='block';
+  const index = Math.floor(Math.random()*list.length);
+  const question = list[index];
+  const options = [question.meaning];
+  while (options.length<4) {
+    let rand = list[Math.floor(Math.random()*list.length)];
+    if (!options.includes(rand.meaning)) options.push(rand.meaning);
+  }
+  options.sort(()=>Math.random()-0.5);
+  document.getElementById('grammarQuizQuestion').textContent=`Mẫu: ${question.text}`;
+  const buttons = document.querySelectorAll('#grammarQuizBox .quiz-option');
+  buttons.forEach((btn,i)=>{
+    btn.textContent=options[i];
+    btn.disabled=false;
+    btn.dataset.correct = options[i]===question.meaning?'true':'false';
+    btn.className = 'quiz-option';
+  });
+}
+
+function checkGrammarAnswer(button) {
+  const isCorrect = button.dataset.correct==='true';
+  const buttons = document.querySelectorAll('#grammarQuizBox .quiz-option');
+  buttons.forEach(btn=>{
+    btn.disabled=true;
+    if (btn.dataset.correct==='true') btn.classList.add('correct');
+    else if (btn===button) btn.classList.add('wrong');
+  });
+}
+
+// Lần đầu load
+updateWordList();
+updateGrammarList();
+showTab('flashcardTab');
+</script>
+</body>
+</html>
